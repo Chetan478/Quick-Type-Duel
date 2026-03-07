@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Type Duel — Lobby</title>
+   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f0f1a;
+            --card: #f0ede8;
+            --accent: #e8736a;
+            --accent-dark: #d9635a;
+            --dark: #1a1a2e;
+            --muted: #999;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 10% 20%, rgba(232,115,106,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, #16213e 0%, #0f0f1a 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DM Sans', sans-serif;
+            padding: 24px;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: pageIn 0.5s ease both;
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── TOP BAR ── */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-link {
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: rgba(255,255,255,0.6); }
+
+        .game-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        /* ── ROOM CODE CARD ── */
+        .room-card {
+            background: var(--dark);
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid rgba(232,115,106,0.15);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .room-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .room-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: 8px;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .room-code span {
+            color: var(--accent);
+        }
+
+        .share-hint {
+            font-size: 12px;
+            color: rgba(255,255,255,0.25);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* ── PLAYERS CARD ── */
+        .players-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+        }
+
+        .players-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .players-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -0.2px;
+        }
+
+        .players-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            background: rgba(232,115,106,0.12);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        #player-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 60px;
+        }
+
+        #player-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(26,26,46,0.06);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            animation: playerIn 0.3s ease both;
+        }
+
+        @keyframes playerIn {
+            from { opacity: 0; transform: translateX(-12px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        #player-list li::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(232,115,106,0.6);
+            flex-shrink: 0;
+        }
+
+        .waiting-text {
+            font-size: 12px;
+            color: var(--muted);
+            font-style: italic;
+            text-align: center;
+            padding: 8px 0;
+        }
+
+        /* ── HOST SECTION ── */
+        .host-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 20px 24px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+        }
+
+        .host-hint {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        #start-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 14px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 6px 20px rgba(232,115,106,0.4);
+            letter-spacing: 0.3px;
+        }
+
+        #start-btn:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(232,115,106,0.5);
+        }
+
+        #start-btn:active { transform: translateY(0); }
+
+        /* ── WAITING (non-host) ── */
+        .waiting-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 20px 24px;
+            text-align: center;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+        }
+
+        .waiting-dots {
+            display: inline-flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .waiting-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: bounce 1.2s infinite;
+        }
+
+        .waiting-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .waiting-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-6px); opacity: 1; }
+        }
+
+        .waiting-card p {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <div class="top-bar">
+        <a href="/" class="back-link">← leave</a>
+        <span class="game-tag">Quick Type Duel</span>
+    </div>
+
+    <!-- Room Code -->
+    <div class="room-card">
+        <p class="room-label">Room Code</p>
+        <div class="room-code">{{ room_code }}</div>
+        <p class="share-hint">share this code with your friends</p>
+    </div>
+
+    <!-- Players -->
+    <div class="players-card">
+        <div class="players-header">
+            <span class="players-title">Players in Lobby</span>
+            <span class="players-count" id="players-count">0 joined</span>
+        </div>
+        <ul id="player-list">
+            <li class="waiting-text">Waiting for players...</li>
+        </ul>
+    </div>
+
+    <!-- Host: Start Button -->
+    {% if is_host %}
+    <div class="host-section">
+        <p class="host-hint">Start when everyone has joined</p>
+        <button id="start-btn">Start Game ⚡</button>
+    </div>
+    {% else %}
+    <!-- Non-host: Waiting -->
+    <div class="waiting-card">
+        <div class="waiting-dots">
+            <span></span><span></span><span></span>
+        </div>
+        <p>Waiting for host to start the game...</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    const socket = io();
+    const roomCode = "{{ room_code }}";
+
+    socket.emit("join", { room_code: roomCode });
+
+    socket.on("update_players", function(data) {
+        const list = document.getElementById("player-list");
+        const count = document.getElementById("players-count");
+
+        list.innerHTML = "";
+        count.textContent = data.players.length + " joined";
+
+        data.players.forEach(function(player) {
+            const li = document.createElement("li");
+            li.textContent = player.name;
+            list.appendChild(li);
+        });
+         const startBtn = document.getElementById("start-btn");
+    if (startBtn) {
+        if (data.players.length < 2) {
+            startBtn.disabled = true;
+            startBtn.textContent = "Need at least 2 players...";
+            startBtn.style.background = "#ccc";
+            startBtn.style.boxShadow = "none";
+            startBtn.style.cursor = "not-allowed";
+        } else {
+            startBtn.disabled = false;
+            startBtn.textContent = "Start Game ⚡";
+            startBtn.style.background = "";
+            startBtn.style.boxShadow = "";
+            startBtn.style.cursor = "";
+        }
+    }
+    });
+
+    const startBtn = document.getElementById("start-btn");
+    if (startBtn) {
+        startBtn.addEventListener("click", function() {
+            this.textContent = "Starting...";
+            this.disabled = true;
+            socket.emit("start_game", { room_code: roomCode });
+        });
+    }
+
+    socket.on("redirect_to_game", function() {
+        window.location = "/game/" + roomCode;
+    });
+</script>
+
+</body>
+</html>
