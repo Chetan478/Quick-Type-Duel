@@ -37,27 +37,6 @@ words = [
         "ConfiDence3","ConseQuence4","ConstRuction5","ConveNient6","CuriOsity7","DeciSion8","DemoCracy9","DeveLopment1","DimeNsion2","DiscOvery3",
         "EducaTion4","EffiCient5","EvolUtion6","FounDation7","FreqUency8","GeneRation9","HarMony1","HistOrical2","IdenTity3","ImagInation4",
         "IndePendent5","InduStry6","InforMation7","InspiRation8","InvesTment9","KnowLedge1","LandScape2","LiteRature3","ManaGement4","MotiVation5"
-    ],
-    # Level 4 – uppercase + numbers + symbols
-    [
-        "Ackn0wledge!","Arch1tecture@","Bureaucracy#","Charact3ristic$","Circumf3rence%","Commun1cation&","Comprehen$ive","Concentr@tion",
-        "Configura!ion","Congratul@tion","Consci3ntious","Const!tutional","Contr0versial","Coord1nation","Counterpr0ductive",
-        "Crypt0graphy","Decentr@lization","Determ1nation","Differ3ntiation","Dispr0portionate","Electr0magnetic",
-        "Entrepr3neurship","Environm3ntalist","Exagger@tion","Extra0rdinary","Fundam3ntal","Heter0geneous",
-        "Identif1cation","Implement@tion","Incompat1bility","Indist1nguishable","Institution@l","Interdisc1plinary",
-        "Interpret@tion","Investig@tion","Microarch1tecture","Miscommunic@tion","Misinterpret@tion",
-        "Multidimens1onal","Neurotransm1tter","Organiz@tional","Pharmaceut1cal","Preconfigur@tion",
-        "Psycholog1cal","Recommend@tion","Rehabilit@tion","Represent@tion","Responsib1lity","Sophistic@tion"
-    ],
-    # Level 5 – heavy symbols
-    [
-        "R@cEc@r","P@ssw0rd","Fr0stB1te","Bl@ckB1rd","Sh@dowStr1ke","N1ghtH@wk","D@rkPh03nix","C0ldF1r3",
-        "Cr!msonSkull","V!perB1te","Gh0stR!der","St0rmBr3ak","Bl@zeFury","Ic3Sh@dow","Fl@m3Wing",
-        "Thund3rCl@w","R@zorF@ng","D@rkW@rden","F!reSt0rm","Ic3D@gger","Ph@ntomB1te","V0ltStr!ke",
-        "Dr@gonFury","Bl!tzSh@rk","SkullCr@sh","F!reW@lker","Sh@dowF@ng","FrostW@rrior",
-        "D@rkKn1ght","V!rusByte","C0d3Br3ak","H@ck3rMind","BitStr!ker","C0d3Ph@ntom",
-        "N3tN!nja","D@t@Cr@sh","R@pidScr1pt","BugHunt3r","StackSh@dow",
-        "NullP0int3r","ByteSh@rk","Scr1ptK!ng","Thr3adSl@y","LogicBr3ak"
     ]
 ]
 
@@ -117,7 +96,7 @@ def end_round(room_code):
 
     current_round = game_state[room_code]["current_round"]
 
-    if current_round < 5:
+    if current_round < 3:
         game_state[room_code]["current_round"] += 1
         game_state[room_code]["players_ready"] = 0
         next_round = game_state[room_code]["current_round"]

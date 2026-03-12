@@ -103,14 +103,15 @@
         }
 
         .current-word {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 42px;
-            color: #1a1a2e;
-            letter-spacing: 4px;
-            text-align: center;
-            transition: all 0.2s;
-            min-height: 64px;
-        }
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(18px, 6vw, 42px);
+    color: #1a1a2e;
+    letter-spacing: clamp(1px, 1.5vw, 4px);
+    text-align: center;
+    transition: all 0.2s;
+    min-height: 64px;
+    word-break: break-all;
+}
 
         .current-word.flash {
             color: #e8736a;
@@ -311,7 +312,7 @@
             <div class="badge timer-badge" id="timer-badge">⏱ 30s</div>
         </div>
 
-        <div class="round-indicator" id="round-indicator">Round 1 of 5</div>
+        <div class="round-indicator" id="round-indicator">Round 1 of 3</div>
 
         <div class="word-section">
             <p class="word-label">Type this word</p>
@@ -437,7 +438,7 @@
     socket.on("round_start", function(data) {
         document.getElementById("round-result").classList.remove("visible");
         document.getElementById("current-word").textContent = data.word;
-        document.getElementById("round-indicator").textContent = "Round " + data.round + " of 5";
+        document.getElementById("round-indicator").textContent = "Round " + data.round + " of 3";
         // re-enable input
         document.getElementById("ans-input").disabled = false;
         document.getElementById("submit-btn").disabled = false;
