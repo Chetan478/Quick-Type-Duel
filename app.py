@@ -1,5 +1,3 @@
-import eventlet
-eventlet.monkey_patch()
 from flask import Flask, render_template, request, redirect, url_for, session
 from database import get_connection, initialize_database
 import random
@@ -9,7 +7,7 @@ from flask_socketio import join_room
 
 app = Flask(__name__)
 app.secret_key = "Hello_Natehc"
-socketio = SocketIO(app, async_mode="eventlet")
+socketio = SocketIO(app, async_mode="threading")
 initialize_database()
 
 words = [
