@@ -231,12 +231,11 @@ def on_start_game(data):
     db = get_connection()
     room = db.execute("SELECT id FROM rooms WHERE room_code = ?", (room_code,)).fetchone()
     players = db.execute("SELECT * FROM players WHERE room_id = ?", (room["id"],)).fetchall()
-    if len(players) < 2:
-        db.close()
-        return
+
     db.execute("UPDATE rooms SET room_status = ? WHERE room_code = ?", ("Active", room_code))
     db.commit()
     db.close()
+
     shuffled_words = [random.sample(round_pool, 10) for round_pool in words]
     game_state[room_code] = {
         "current_round": 1,

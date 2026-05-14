@@ -359,34 +359,21 @@
         document.getElementById("current-word").textContent = "⚡ " + data.seconds_left;
     });
 
-    socket.on("word_result", function(data) {
-        const input = document.getElementById("ans-input");
-        if (data.correct) {
-            input.style.background = "#27ae60";  // green flash
-        } else {
-            input.style.background = "#c0392b";  // red flash
-        }
-        setTimeout(function() { input.style.background = "#e8736a"; }, 400);
-
-        if (data.next_word) {
-            document.getElementById("current-word").textContent = data.next_word;
-        } else {
-            document.getElementById("current-word").textContent = "⏳ Waiting for others...";
-            document.getElementById("ans-input").disabled = true;
-            document.getElementById("submit-btn").disabled = true;
-        }
-        document.getElementById("score-badge").textContent = "Score: " + data.score;
-    });
-
-    socket.on("timer_tick", function(data) {
-        document.getElementById("timer-badge").textContent = "⏱ " + data.seconds_left + "s";
+    socket.on("round_start", function(data) {
+        document.getElementById("round-result").classList.remove("visible");
+        document.getElementById("current-word").textContent = data.word;
+        document.getElementById("round-indicator").textContent = "Round " + data.round + " of 3";
+        // re-enable input
+        document.getElementById("ans-input").disabled = false;
+        document.getElementById("submit-btn").disabled = false;
+        document.getElementById("score-badge").textContent = "Score: 0";
     });
 
     socket.on("round_end", function(data) {
         document.getElementById("round-result").classList.add("visible");
-        document.getElementById("round-winner-text").textContent = data.round_winner
-    ? "🏆 " + data.round_winner + " wins!"
-    : "🤝 It's a draw!";
+        document.getElementById("round-winner-text").textContent = data.round_winner ? "🏆 " + data.round_winner + " wins!"
+        : "🤝 It's a draw!";
+
         const rows = document.getElementById("round-player-rows");
         rows.innerHTML = "";
         data.players.forEach(function(player) {
@@ -414,6 +401,30 @@
         });
     });
 
+    socket.on("word_result", function(data) {
+        const input = document.getElementById("ans-input");
+        if (data.correct) {
+            input.style.background = "#27ae60";  // green flash
+        } else {
+            input.style.background = "#c0392b";  // red flash
+        }
+        setTimeout(function() { input.style.background = "#e8736a"; }, 400);
+
+        if (data.next_word) {
+            document.getElementById("current-word").textContent = data.next_word;
+        } else {
+            document.getElementById("current-word").textContent = "⏳ Waiting for others...";
+            document.getElementById("ans-input").disabled = true;
+            document.getElementById("submit-btn").disabled = true;
+        }
+        document.getElementById("score-badge").textContent = "Score: " + data.score;
+    });
+
+    socket.on("timer_tick", function(data) {
+        document.getElementById("timer-badge").textContent = "⏱ " + data.seconds_left + "s";
+    });
+
+
     document.getElementById("submit-btn").addEventListener("click", function() {
         const input = document.getElementById("ans-input");
         const word = input.value.trim();
@@ -435,15 +446,7 @@
         this.textContent = "Waiting...";
     });
 
-    socket.on("round_start", function(data) {
-        document.getElementById("round-result").classList.remove("visible");
-        document.getElementById("current-word").textContent = data.word;
-        document.getElementById("round-indicator").textContent = "Round " + data.round + " of 3";
-        // re-enable input
-        document.getElementById("ans-input").disabled = false;
-        document.getElementById("submit-btn").disabled = false;
-        document.getElementById("score-badge").textContent = "Score: 0";
-    });
+
 </script>
 
 </body>
