@@ -39,7 +39,7 @@ words = [
 ]
 
 game_state = {}
-
+socket_players = {}
 
 # ─── BACKGROUND TASKS ───────────────────────────────────────────────
 
@@ -215,7 +215,7 @@ def game(room_code):
 def on_join(data):
     room_code = data["room_code"]
     join_room(room_code)
-
+    socket_players[request.sid] = {"name": session["name"], "room_code": room_code}
     conn = get_connection()
     db = conn.cursor()
     room_id = db.execute("SELECT id FROM rooms WHERE room_code = ?", (room_code,)).fetchone()
@@ -258,6 +258,7 @@ def on_start_game(data):
 def on_join_game(data):
     room_code = data["room_code"]
     join_room(room_code)
+    socket_players[request.sid] = {"name": session["name"], "room_code": room_code}
 
     # if round is active (e.g. player refreshed mid-round), rejoin silently
     if game_state[room_code]["round_status"] == "active":
